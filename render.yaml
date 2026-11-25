@@ -1,0 +1,36 @@
+# Render Blueprint 参考配置（托管 backend Node.js 服务）
+# 使用方式：在 Render 控制台选择 New -> Blueprint，或按以下字段手动创建 Web Service
+services:
+  - type: web
+    name: weiguang-starlight-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build:prod
+    startCommand: npm run start:prod
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: DATABASE_URL
+        sync: false # 填入 Neon / Supabase PostgreSQL 连接串
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false # 填入 Vercel 前端域名，如 https://your-app.vercel.app
+      - key: AUTO_SEED_IF_EMPTY
+        value: "true"
+      - key: SEED_ADMIN_USERNAME
+        value: admin
+      - key: SEED_ADMIN_PASSWORD
+        sync: false # 生产环境请设置强密码
+      - key: AI_PROVIDER
+        value: auto
+      - key: LLM_BASE_URL
+        value: https://api.deepseek.com/v1
+      - key: LLM_API_KEY
+        sync: false # 可选；留空将自动降级本地高质量 fallback
+      - key: LLM_MODEL
+        value: deepseek-chat

@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "PingFang SC", "HarmonyOS Sans SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-serif: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", serif;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  background: #02030a;
+  color: var(--color-slate-100);
+  font-family: var(--font-sans);
+  overscroll-behavior: none;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 纯净高对比深空黑底色 */
+.night-sky {
+  background:
+    radial-gradient(ellipse 75% 55% at 50% 48%, rgba(20, 26, 58, 0.35) 0%, rgba(5, 8, 22, 0.25) 48%, transparent 78%),
+    linear-gradient(180deg, #03040d 0%, #02030a 55%, #010207 100%);
+}
+.night-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+@layer components {
+  /* 深色半透明毛玻璃 + 极细微光边框 */
+  .glass {
+    background: linear-gradient(180deg, rgba(22, 30, 60, 0.62), rgba(10, 14, 32, 0.7));
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(190, 205, 255, 0.1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 20px 60px -20px rgba(0, 0, 0, 0.75);
+  }
+
+  .icon-btn {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-300 transition hover:bg-white/10 hover:text-white active:scale-95;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-amber-200/40 focus:bg-white/[0.07];
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-slate-900 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    background: linear-gradient(135deg, #fff0c9, #ffc98a);
+    box-shadow: 0 0 24px -6px rgba(255, 200, 138, 0.6);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 transition hover:border-white/25 hover:text-white active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-slate-300;
+  }
+}
+
+/* 主按钮呼吸光 */
+.light-btn {
+  background: linear-gradient(135deg, rgba(255, 236, 196, 0.95), rgba(255, 196, 140, 0.95));
+  box-shadow:
+    0 0 0 1px rgba(255, 230, 190, 0.5),
+    0 0 30px -4px rgba(255, 200, 140, 0.55);
+  animation: breathe 3.6s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 230, 190, 0.5), 0 0 24px -6px rgba(255, 200, 140, 0.45); }
+  50% { box-shadow: 0 0 0 1px rgba(255, 230, 190, 0.7), 0 0 42px -2px rgba(255, 200, 140, 0.7); }
+}
+
+.orb-pulse {
+  animation: orb 2.8s ease-in-out infinite;
+}
+@keyframes orb {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+/* 过渡 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-active .modal-panel,
+.fade-leave-active .modal-panel {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fade-enter-from .modal-panel,
+.fade-leave-to .modal-panel {
+  transform: translateY(18px) scale(0.98);
+}
+
+.sheet-enter-active,
+.sheet-leave-active {
+  transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sheet-enter-from,
+.sheet-leave-to {
+  opacity: 0;
+  transform: translateY(24px);
+}
+@media (min-width: 768px) {
+  .sheet-enter-from,
+  .sheet-leave-to {
+    transform: translateX(24px);
+  }
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}

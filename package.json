@@ -1,0 +1,16 @@
+{
+  "name": "weiguang-starlight",
+  "private": true,
+  "version": "0.1.0",
+  "description": "微光星空（Weiguang Starlight）全栈 Monorepo",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev -w frontend",
+    "dev:backend": "npm run dev -w backend",
+    "build:frontend": "npm run build -w frontend",
+    "db:migrate": "npm run prisma:migrate -w backend"
+  }
+}

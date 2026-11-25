@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Emotion {
+  warm
+  calm
+  joy
+  hope
+  touched
+}
+
+enum StarStatus {
+  APPROVED
+  FLAGGED
+  HIDDEN
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  nickname     String
+  role         Role     @default(USER)
+  isGuest      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  stars          Star[]
+  encouragements Encouragement[]
+  comments       Comment[]
+  microActions   UserMicroAction[]
+}
+
+model Star {
+  id              Int        @id @default(autoincrement())
+  userId          Int
+  content         String
+  aiReply         String?
+  emotion         Emotion
+  colorHex        String
+  themeTag        String
+  posX            Float
+  posY            Float
+  posZ            Float
+  lightCount      Int        @default(0)
+  status          StarStatus @default(APPROVED)
+  constellationId Int?
+  createdAt       DateTime   @default(now())
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  constellation  Constellation?   @relation(fields: [constellationId], references: [id], onDelete: SetNull)
+  encouragements Encouragement[]
+  comments       Comment[]
+  microAction    UserMicroAction?
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@index([constellationId])
+}
+
+model Constellation {
+  id        Int      @id @default(autoincrement())
+  name      String
+  themeTag  String   @unique
+  story     String
+  createdAt DateTime @default(now())
+
+  stars Star[]
+}
+
+/// 仅支持预设鼓励语（presetText 必须来自服务端预设列表），不支持自由评论
+model Encouragement {
+  id         Int      @id @default(autoincrement())
+  starId     Int
+  userId     Int
+  presetText String
+  createdAt  DateTime @default(now())
+
+  star Star @relation(fields: [starId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 每个用户对同一颗星只能点亮一次
+  @@unique([starId, userId])
+}
+
+/// 星语回响实时留言（经双层安全审核）
+model Comment {
+  id        Int        @id @default(autoincrement())
+  starId    Int
+  userId    Int
+  content   String
+  status    StarStatus @default(APPROVED)
+  createdAt DateTime   @default(now())
+
+  star Star @relation(fields: [starId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([starId, status, createdAt])
+  @@index([userId])
+}
+
+model MicroAction {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  activeDate  DateTime
+
+  completions UserMicroAction[]
+
+  @@index([activeDate])
+}
+
+model UserMicroAction {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  actionId    Int
+  completedAt DateTime @default(now())
+  starId      Int?     @unique
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action MicroAction @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  star   Star?       @relation(fields: [starId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, actionId])
+}
